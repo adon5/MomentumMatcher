@@ -1,4 +1,5 @@
 # Documentation for `main.py`
+# Currently Outdated
 
 ## Overview
 This script is designed to load mentee and mentor data from CSV files, process the data, and match mentees with mentors based on various criteria. The matches are then saved to an output CSV file.
