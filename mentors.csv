@@ -1,0 +1,6 @@
+﻿id,full_name,gender,contact_email,locations,capacity,intro,state_of_origin,country_of_origin,gender_preference
+101,Dr. Fiona Williams,female,fiona.williams@example.com,"Melbourne",1,"I am Dr. Williams, a surgeon with 10 years of experience.",VIC,AU,False
+102,Dr. George Brown,male,george.brown@example.com,"Sydney",2,"Dr. Brown here, a psychiatrist passionate about mental health.",NSW,AU,True
+103,Dr. Helen Clark,female,helen.clark@example.com,"Brisbane",1,"I specialize in pediatrics and love teaching.",QLD,AU,False
+104,Dr. Ian Thompson,male,ian.thompson@example.com,"Perth",2,"Emergency medicine specialist with a focus on education.",WA,AU,False
+105,Dr. Jennifer Martin,female,jennifer.martin@example.com,"Melbourne; Adelaide",1,"Oncologist dedicated to mentoring the next generation.",SA,AU,True

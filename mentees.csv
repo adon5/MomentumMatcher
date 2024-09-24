@@ -1,0 +1,6 @@
+﻿id,full_name,gender,contact_email,locations,intro,looking_for,state_of_origin,country_of_origin,gender_preference,prefers_from_origin
+1,Alice Smith,female,alice.smith@example.com,"Melbourne; Sydney","Hi, I'm Alice, a first-year medical student looking forward to learning from experienced doctors.","I'm looking for guidance in surgery and tips on work-life balance.",VIC,AU,True,True
+2,Bob Johnson,male,bob.johnson@example.com,"Brisbane; Perth","Bob here, passionate about pediatrics.","Seeking mentorship in pediatrics and research opportunities.",QLD,AU,False,False
+3,Charlie Lee,male,charlie.lee@example.com,"Sydney","I'm Charlie, interested in psychiatry.","Looking for a mentor who can guide me in psychiatry and mental health.",NSW,AU,True,True
+4,Diana Patel,female,diana.patel@example.com,"Melbourne","Diana here, aiming to specialize in oncology.","I would love to connect with an oncologist mentor.",VIC,AU,False,False
+5,Emily Chen,female,emily.chen@example.com,"Perth; Adelaide","I'm Emily, keen on emergency medicine.","Seeking advice on emergency medicine and balancing studies.",WA,AU,True,True
