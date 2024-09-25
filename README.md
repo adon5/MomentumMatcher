@@ -2,7 +2,7 @@
 
 ## Overview
 
-This Python script implements a mentor-mentee matching system using various data processing and machine learning techniques. The system reads mentor and mentee data from CSV files, processes the information, and uses a combination of text similarity and other criteria to create optimal matches.
+This Python script implements a mentor-mentee matching system using SBERT, bipartite graph modelling and the Hungarian algorithm. The system reads mentor and mentee data from CSV files, processes the information, and uses a combination of text similarity and other criteria to create optimal matches.
 
 ## Table of Contents
 
