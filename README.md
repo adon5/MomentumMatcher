@@ -1,93 +1,119 @@
-# Documentation for `main.py`
-# Currently Outdated
+# Mentor-Mentee Matching System Documentation
 
 ## Overview
-This script is designed to load mentee and mentor data from CSV files, process the data, and match mentees with mentors based on various criteria. The matches are then saved to an output CSV file.
+
+This Python script implements a mentor-mentee matching system using various data processing and machine learning techniques. The system reads mentor and mentee data from CSV files, processes the information, and uses a combination of text similarity and other criteria to create optimal matches.
+
+## Table of Contents
+
+1. [Dependencies](#dependencies)
+2. [Data Structures](#data-structures)
+3. [Functions](#functions)
+4. [Matching Algorithm](#matching-algorithm)
+5. [Usage](#usage)
 
 ## Dependencies
+
+The script requires the following Python libraries:
+
 - pandas
 - numpy
-- typing
 - scipy
 - sentence_transformers
 - sklearn
-- mentoringClasses (custom module containing `Mentee` and `Mentor` classes)
+
+Ensure these are installed before running the script.
+
+## Data Structures
+
+### Mentor
+
+```python
+@dataclass
+class Mentor:
+    id: int
+    full_name: str
+    gender: str
+    contact_email: str
+    locations: Set[str]
+    capacity: int = 1
+    intro: str = 'Not provided'
+    state_of_origin: str = "VIC"
+    country_of_origin: str = "AU"
+    gender_preference: bool = False
+```
+
+### Mentee
+
+```python
+@dataclass
+class Mentee:
+    id: int
+    full_name: str
+    gender: str
+    contact_email: str
+    locations: Set[str]
+    intro: str = 'Not provided'
+    looking_for: str = 'Not provided'
+    state_of_origin: str = "VIC"
+    country_of_origin: str = "AU"
+    gender_preference: bool = False  
+    prefers_from_origin: bool = True
+```
 
 ## Functions
 
 ### `load_mentees_from_csv(mentee_csv) -> List[Mentee]`
-Loads mentee data from a CSV file and returns a list of `Mentee` objects.
 
-- **Parameters:**
-  - `mentee_csv` (str): Path to the mentee CSV file.
-- **Returns:**
-  - List of `Mentee` objects.
+Loads mentee data from a CSV file and returns a list of Mentee objects.
 
 ### `load_mentors_from_csv(mentors_csv) -> List[Mentor]`
-Loads mentor data from a CSV file and returns a list of `Mentor` objects.
 
-- **Parameters:**
-  - `mentors_csv` (str): Path to the mentor CSV file.
-- **Returns:**
-  - List of `Mentor` objects.
+Loads mentor data from a CSV file and returns a list of Mentor objects.
 
 ### `match_mentees_and_mentors(mentees: List[Mentee], mentors: List[Mentor], output_csv='matches.csv')`
-Matches mentees with mentors based on various criteria and saves the matches to a CSV file.
 
-- **Parameters:**
-  - `mentees` (List[Mentee]): List of `Mentee` objects.
-  - `mentors` (List[Mentor]): List of `Mentor` objects.
-  - `output_csv` (str, optional): Path to the output CSV file. Default is 'matches.csv'.
-- **Returns:**
-  - None
+The main function that performs the matching algorithm and outputs the results to a CSV file.
 
-## Matching Process
-1. **Load Sentence Transformer Model:**
-   - Uses `SentenceTransformer('all-MiniLM-L6-v2')` to encode text data for similarity comparison.
+## Matching Algorithm
 
-2. **Separate Mentors:**
-   - Mentors are divided into those who can take only one mentee (`mentors_single`) and those who can take multiple mentees (`mentors_multiple`).
+The matching algorithm uses the following steps:
 
-3. **Define Capacity:**
-   - Sets the capacity for each mentor based on their ability to take multiple mentees.
+1. Expand mentors based on their capacity.
+2. Generate text embeddings for mentor intros and mentee "looking for" statements using SentenceTransformer.
+3. Calculate compatibility scores based on various factors:
+   - Gender preference match
+   - Origin preference match
+   - Location overlap
+   - State and country match
+   - Text similarity between mentor intro and mentee "looking for" statement
+4. Create a cost matrix based on compatibility scores.
+5. Apply the Hungarian Algorithm (linear sum assignment) to find optimal matches.
+6. Save matches to a CSV file and report unmatched mentees.
 
-4. **Perform Matching:**
-   - Matches are performed in two phases:
-     - **Phase 1:** Matches mentees with mentors who can take only one mentee.
-     - **Phase 2:** Matches remaining mentees with mentors who can take multiple mentees.
-   - Uses cosine similarity to compare text embeddings of mentee and mentor descriptions.
-   - Applies hard constraints based on gender and origin preferences.
-   - Uses the Hungarian algorithm (`linear_sum_assignment`) to find the optimal matching based on compatibility scores.
+### Scoring Factors
 
-5. **Save Matches:**
-   - Saves the matches to the specified output CSV file.
-   - Prints unmatched mentees, if any.
+- `GENDER_MISMATCH_PENALTY`: 20
+- `ORIGIN_MISMATCH_PENALTY`: 5
+- `LOCATION_WEIGHT`: 3
+- `STATE_MATCH_WEIGHT`: 2
+- `COUNTRY_MATCH_WEIGHT`: 1
+- `TEXT_SIMILARITY_WEIGHT`: 5
 
 ## Usage
-To run the script, execute the following command:
 
-python main.py
+1. Prepare two CSV files: `mentees.csv` and `mentors.csv` with the required fields.
+2. Run the script:
 
-This will load mentee and mentor data from `mentees.csv` and `mentors.csv`, perform the matching, and save the results to `matches.csv`.
+```python
+if __name__ == "__main__":
+    mentees = load_mentees_from_csv('mentees.csv')
+    mentors = load_mentors_from_csv('mentors.csv')
+    match_mentees_and_mentors(mentees, mentors, output_csv='matches.csv')
+```
 
-## Example CSV Structure
-### Mentees CSV
-| id | full_name | gender | contact_email | locations | intro | looking_for | state_of_origin | country_of_origin | gender_preference | prefers_from_origin |
-|----|-----------|--------|---------------|-----------|-------|-------------|-----------------|-------------------|-------------------|---------------------|
-| 1  | John Doe  | male   | john@example.com | loc1;loc2 | Intro text | Looking for text | VIC | AU | true | true |
+3. The script will output the matches to `matches.csv` and print information about the matching process, including any unmatched mentees.
 
-### Mentors CSV
-| id | full_name | gender | contact_email | locations | multiple | intro | state_of_origin | country_of_origin | gender_preference |
-|----|-----------|--------|---------------|-----------|----------|-------|-----------------|-------------------|-------------------|
-| 1  | Jane Smith| female | jane@example.com | loc1;loc2 | true | Intro text | VIC | AU | false |
+## Note
 
-## Notes
-- Ensure that the `mentoringClasses` module is available and contains the `Mentee` and `Mentor` classes.
-- Adjust the CSV file paths as needed.
-
-
-# TO DO
-Hub for monash medical students and graduate doctors - find research projects, opportunities, mentoring connections, career advice
-Web platform
-Make profile, link socials, upload resume
-
+This system assumes certain defaults and scoring weights. Adjust these values in the `match_mentees_and_mentors` function to fine-tune the matching process for specific use cases.
