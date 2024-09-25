@@ -17,7 +17,7 @@ class Mentor:
     intro: str = 'Not provided'
     state_of_origin: str = "VIC"
     country_of_origin: str = "AU"
-    gender_preference: bool = False  # True means prefer same gender
+    gender_preference: bool = False  # True means prefer OWN gender -> This is an assumption we might want to change.
 
 @dataclass
 class Mentee:
@@ -30,7 +30,7 @@ class Mentee:
     looking_for: str = 'Not provided'
     state_of_origin: str = "VIC"
     country_of_origin: str = "AU"
-    gender_preference: bool = False  # True means prefer same gender
+    gender_preference: bool = False  
     prefers_from_origin: bool = True
 
 def load_mentees_from_csv(mentee_csv) -> List[Mentee]:
@@ -182,17 +182,17 @@ def match_mentees_and_mentors(mentees: List[Mentee], mentors: List[Mentor], outp
             score += origin_mismatch_penalty
 
             location_overlap = len(mentee.locations & mentor.locations)
-            location_score = location_overlap * LOCATION_WEIGHT  # Weight for location overlap
+            location_score = location_overlap * LOCATION_WEIGHT  
             score += location_score
 
             if mentee.state_of_origin == mentor.state_of_origin:
-                state_match_score = STATE_MATCH_WEIGHT  # Weight for state match
+                state_match_score = STATE_MATCH_WEIGHT  
             else:
                 state_match_score = 0
             score += state_match_score
 
             if mentee.country_of_origin == mentor.country_of_origin:
-                country_match_score = COUNTRY_MATCH_WEIGHT  # Weight for country match
+                country_match_score = COUNTRY_MATCH_WEIGHT  
             else:
                 country_match_score = 0
             score += country_match_score
