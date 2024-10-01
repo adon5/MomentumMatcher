@@ -114,6 +114,3 @@ if __name__ == "__main__":
 
 3. The script will output the matches to `matches.csv` and print information about the matching process, including any unmatched mentees.
 
-## Note
-
-This system assumes certain defaults and scoring weights. Adjust these values in the `match_mentees_and_mentors` function to fine-tune the matching process for specific use cases.
