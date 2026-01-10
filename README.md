@@ -1,116 +1,50 @@
-# Mentor-Mentee Matching System Documentation
+# Momentum Matcher
 
-## Overview
+This was a one-time script for matching mentors and mentees for the [MUMUS Momentum mentoring program](https://www.mumusmomentum.org/) based on Google form responses, exported to csv. The mentors and mentees had no knowledge about each other (i.e. they did not rank each other, they just input information about themselves and preferences). View the full script in main.py. 
 
-This Python script implements a mentor-mentee matching system using SBERT, bipartite graph modelling and the Hungarian algorithm. 
+It is not very useful for anyone unless you have columns strictly in the format specified. Today, you could just boot up Claude Code or Cursor Agent, etc to write your own script.
 
-## Table of Contents
+## Installation
 
-1. [Dependencies](#dependencies)
-2. [Data Structures](#data-structures)
-3. [Functions](#functions)
-4. [Matching Algorithm](#matching-algorithm)
-5. [Usage](#usage)
+This still uses requirements.txt so:  
 
-## Dependencies
+Set up a virtual environment:  
+`python -m venv .venv`  
 
-The script requires the following Python libraries:
+Run the virtual environment:  
+`source .venv/bin/activate` (Linux or MacOS)  
+    or  
+`.venv\Scripts\activate` (Windows)  
 
-- pandas
-- numpy
-- scipy
-- sentence_transformers
-- sklearn
+Install dependencies from requirements.txt:  
+`pip install -r requirements.txt`
 
-Ensure these are installed before running the script.
+## How it works
 
-## Data Structures
+1. Expand mentors based on their capacity
+2. Generate text embeddings for mentor intros and mentee "looking for" statements using sentence transformers.
+3. Calculate compatibility scores, an integer:
+   - Gender preference match: `GENDER_MISMATCH_PENALTY = 20`
+   - Origin preference match: `ORIGIN_MISMATCH_PENALTY = 5`
+   - Location overlap: `LOCATION_WEIGHT = 3`
+   - State and country match: `STATE_MATCH_WEIGHT = 2`, `COUNTRY_MATCH_WEIGHT = 1`
+   - Text similarity between mentor intro and mentee "looking for" statement: `TEXT_SIMILARITY_WEIGHT = 5`
+4. Create a cost matrix based on compatibility scores and apply linear sum assignment
+5. Save matches to a CSV file and report unmatched mentees.
 
-### Mentor
-
-```python
-@dataclass
-class Mentor:
-    id: int
-    full_name: str
-    gender: str
-    contact_email: str
-    locations: Set[str]
-    capacity: int = 1
-    intro: str = 'Not provided'
-    state_of_origin: str = "VIC"
-    country_of_origin: str = "AU"
-    gender_preference: bool = False
-```
-
-### Mentee
-
-```python
-@dataclass
-class Mentee:
-    id: int
-    full_name: str
-    gender: str
-    contact_email: str
-    locations: Set[str]
-    intro: str = 'Not provided'
-    looking_for: str = 'Not provided'
-    state_of_origin: str = "VIC"
-    country_of_origin: str = "AU"
-    gender_preference: bool = False  
-    prefers_from_origin: bool = True
-```
-
-## Functions
-
-### `load_mentees_from_csv(mentee_csv) -> List[Mentee]`
-
-Loads mentee data from a CSV file and returns a list of Mentee objects.
-
-### `load_mentors_from_csv(mentors_csv) -> List[Mentor]`
-
-Loads mentor data from a CSV file and returns a list of Mentor objects.
-
-### `match_mentees_and_mentors(mentees: List[Mentee], mentors: List[Mentor], output_csv='matches.csv')`
-
-The main function that performs the matching algorithm and outputs the results to a CSV file.
-
-## Matching Algorithm
-
-The matching algorithm uses the following steps:
-
-1. Expand mentors based on their capacity.
-2. Generate text embeddings for mentor intros and mentee "looking for" statements using SentenceTransformer.
-3. Calculate compatibility scores based on various factors:
-   - Gender preference match
-   - Origin preference match
-   - Location overlap
-   - State and country match
-   - Text similarity between mentor intro and mentee "looking for" statement
-4. Create a cost matrix based on compatibility scores.
-5. Apply the Hungarian Algorithm (linear sum assignment) to find optimal matches.
-6. Save matches to a CSV file and report unmatched mentees.
-
-### Scoring Factors
-
-- `GENDER_MISMATCH_PENALTY`: 20
-- `ORIGIN_MISMATCH_PENALTY`: 5
-- `LOCATION_WEIGHT`: 3
-- `STATE_MATCH_WEIGHT`: 2
-- `COUNTRY_MATCH_WEIGHT`: 1
-- `TEXT_SIMILARITY_WEIGHT`: 5
+*We have to create dummy mentors to handle multiple mentees to one mentor. We could model it as a network flow problem instead.*
+*We use nested for loops to generate a rectangular matrix. It is very inefficient compared to just vectorizing the scores and comparisons. I will not change it for historical preservation purposes.*
 
 ## Usage
 
-1. Prepare two CSV files: `mentees.csv` and `mentors.csv` with the required fields.
-2. Run the script:
+1. Prepare mentees.csv and mentors.csv with the required fields.
+   See mentees.csv, mentors.csv as example data. See forms.txt for the form text.
+3. Run the script, after ensuring you are in the right directory:
+   
+    `py main.py` (Windows)  
+        or  
+    `python3 main.py` (MacOS/Linux)
 
-```python
-if __name__ == "__main__":
-    mentees = load_mentees_from_csv('mentees.csv')
-    mentors = load_mentors_from_csv('mentors.csv')
-    match_mentees_and_mentors(mentees, mentors, output_csv='matches.csv')
-```
+4. Matches will be output to matches.csv. Details about the matching process will be output into the terminal, including any unmatched mentees.
 
-3. The script will output the matches to `matches.csv` and print information about the matching process, including any unmatched mentees.
 
